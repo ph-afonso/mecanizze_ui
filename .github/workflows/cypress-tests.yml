@@ -1,41 +1,40 @@
-# .github/workflows/cypress-tests.yml
+name: E2E Tests (Cypress)
 
-name: Testes Cypress
-
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1, 2] # Roda os testes em 2 instâncias paralelas
+
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
+      - name: ⬇️ Checkout do código
+        uses: actions/checkout@v3
 
-      # PASSO 1: Instalar o pnpm no servidor (obrigatório)
-      - name: Instalar pnpm
-        uses: pnpm/action-setup@v3
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          version: 10 # ou a versão que você usa
+          node-version: '18'
 
-      # PASSO 2: Configurar o Node.js e o cache para pnpm
-      - name: Instalar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
+      - name: 📦 Instalar dependências
+        run: npm ci
 
-      - name: Executar testes Cypress em paralelo
+      - name: 🚧 Build do Quasar (modo SPA, se for o caso)
+        run: npm run build
+
+      - name: 🚀 Start do app para testes
+        run: |
+          npm run dev &
+        env:
+          NODE_ENV: development
+
+      - name: 🧪 Rodar Cypress
         uses: cypress-io/github-action@v6
         with:
-          # PASSO 3: Corrigir o comando de start e a porta
-          start: pnpm dev
-          wait-on: 'http://localhost:8080' # Porta padrão do Quasar
-          record: true
-          parallel: true
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          wait-on: 'http://localhost:9000' # ou 8080, dependendo do seu dev server
+          wait-on-timeout: 60
