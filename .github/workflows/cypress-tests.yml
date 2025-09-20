@@ -1,40 +1,33 @@
-# .github/workflows/cypress-tests.yml
-
-name: Testes Cypress
-
+name: Cypress Tests
 on: [push]
-
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    # Runs tests in parallel with matrix strategy https://docs.cypress.io/guides/guides/parallelization
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    # Also see warning here https://github.com/cypress-io/github-action#parallel
+    strategy:
+      fail-fast: false # https://github.com/cypress-io/github-action/issues/48
+      matrix:
+        containers: [1, 2] # Uses 2 parallel instances
     steps:
-      # 1. Baixa o seu código para o servidor
-      - name: Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
-
-      # 2. Instala o pnpm no servidor
-      - name: Instalar pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10
-
-      # 3. Configura a versão correta do Node.js e ativa o cache do pnpm
-      - name: Instalar Node.js e cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      # 4. Instala as dependências do projeto (node_modules)
-      - name: Instalar dependências
-        run: pnpm install --frozen-lockfile
-
-      # 5. Roda a action do Cypress, que agora encontrará o pnpm e as dependências
-      - name: Executar testes Cypress
+      - name: Cypress run
+        # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
         with:
-          start: pnpm dev
-          wait-on: 'http://localhost:8080'
+          # Starts web server for E2E tests - replace with your own server invocation
+          # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
+          start: npm start
+          wait-on: 'http://localhost:3000' # Waits for above
+          # Records to Cypress Cloud 
+          # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
           record: true
+          parallel: true # Runs test in parallel using settings above
         env:
+          # For recording and parallelization to work you must set your CYPRESS_RECORD_KEY
+          # in GitHub repo → Settings → Secrets → Actions
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
