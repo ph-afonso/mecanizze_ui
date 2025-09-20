@@ -39,5 +39,6 @@ jobs:
       - name: 🧪 Rodar Cypress
         uses: cypress-io/github-action@v6
         with:
-          wait-on: 'http://localhost:9000' # ou 8080, dependendo do seu dev server
+          install-command: pnpm install && pnpm exec cypress install
+          wait-on: 'http://localhost:9000' # ou sua porta real
           wait-on-timeout: 60
