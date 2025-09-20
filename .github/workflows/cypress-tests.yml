@@ -28,14 +28,8 @@ jobs:
       - name: 📥 Instalar binário do Cypress
         run: pnpm exec cypress install
 
-      - name: 🚀 Iniciar o app Quasar (modo dev)
-        run: pnpm run dev &  # ou quasar dev & se for o script
-        env:
-          NODE_ENV: development
-
-      - name: 🧪 Rodar Cypress (E2E)
+      - name: 🧪 Rodar Cypress (E2E) contra Vercel
         uses: cypress-io/github-action@v6
         with:
-          install: false  # Já fizemos `pnpm install` e `cypress install`
-          wait-on: 'http://localhost:9000'  # Altere se sua porta for diferente
-          wait-on-timeout: 60
+          install: false  # Cypress já instalado
+          config: baseUrl=https://mecanizze-ui.vercel.app
