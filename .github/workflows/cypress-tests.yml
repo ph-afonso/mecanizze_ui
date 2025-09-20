@@ -1,25 +1,23 @@
-name: E2E Tests (Cypress)
+name: E2E Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  cypress-run:
+  e2e-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout do código
+      - name: 📥 Checkout do código
         uses: actions/checkout@v3
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '20'
 
       - name: 🛠️ Instalar pnpm
         run: npm install -g pnpm
@@ -27,18 +25,23 @@ jobs:
       - name: 📦 Instalar dependências
         run: pnpm install
 
-      - name: 🚧 Build do Quasar (modo SPA, se for o caso)
-        run: npm run build
+      - name: 📥 Baixar binário do Cypress
+        run: pnpm exec cypress install
 
-      - name: 🚀 Start do app para testes
-        run: |
-          npm run dev &
+      - name: 🚀 Start do app (modo dev)
+        run: pnpm run dev & # ou 'quasar dev &' dependendo do seu script
         env:
           NODE_ENV: development
+
+      - name: ⏳ Esperar app subir
+        uses: jakejarvis/wait-for-netlify-action@v1
+        with:
+          url: 'http://localhost:9000' # ajuste para a porta correta
+          timeout: 60
 
       - name: 🧪 Rodar Cypress
         uses: cypress-io/github-action@v6
         with:
-          install-command: pnpm install && pnpm exec cypress install
-          wait-on: 'http://localhost:9000' # ou sua porta real
+          install: false # já instalamos o Cypress acima
+          wait-on: 'http://localhost:9000'
           wait-on-timeout: 60
