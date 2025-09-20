@@ -1,14 +1,48 @@
 # .github/workflows/cypress-tests.yml
 
-name: E2E Cypress Tests
+name: Testes Cypress
 
 on: [push]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-      - uses: actions/checkout@v4
-      - name: Cypress run
-      - uses: cypress-io/github-action@v6
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Instalar Node.js e cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar binário do Cypress
+        run: pnpm cypress install
+
+      # --- MUDANÇAS A PARTIR DAQUI ---
+
+      - name: Iniciar servidor de desenvolvimento (em background)
+        # O '&' no final executa o comando em segundo plano, permitindo que o workflow continue
+        run: pnpm dev &
+
+      - name: Esperar o servidor iniciar
+        # Instala e usa o pacote 'wait-on' para esperar até que a porta 8080 esteja respondendo
+        run: pnpm add -D wait-on && npx wait-on http://localhost:8080
+
+      - name: Executar os testes Cypress (agora que o servidor está pronto)
+        # A action agora tem uma única responsabilidade: rodar os testes.
+        uses: cypress-io/github-action@v6
+        with:
+          # Removemos 'start' e 'wait-on' daqui
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
