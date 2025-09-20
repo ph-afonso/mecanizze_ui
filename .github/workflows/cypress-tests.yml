@@ -33,3 +33,5 @@ jobs:
         with:
           install: false
           config: baseUrl=https://mecanizze-ui.vercel.app
+          record: true
+          key: ${{ secrets.CYPRESS_RECORD_KEY }}
