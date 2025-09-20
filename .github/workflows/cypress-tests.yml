@@ -1,14 +1,33 @@
 # .github/workflows/cypress-tests.yml
 
-name: E2E Cypress Tests
+name: Testes Cypress
 
 on: [push]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-      - uses: actions/checkout@v4
-      - name: Cypress run
-      - uses: cypress-io/github-action@v6
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Instalar Node.js e cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Executar testes Cypress e gravar os resultados
+        uses: cypress-io/github-action@v6
+        with:
+          # Inicia o servidor de dev e espera a URL antes de rodar os testes
+          start: pnpm dev
+          wait-on: 'http://localhost:8080' # Ajuste a porta se for diferente
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
