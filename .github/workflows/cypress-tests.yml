@@ -31,5 +31,5 @@ jobs:
       - name: 🧪 Rodar Cypress (E2E) contra Vercel
         uses: cypress-io/github-action@v6
         with:
-          install: false  # Cypress já instalado
+          install: false
           config: baseUrl=https://mecanizze-ui.vercel.app
