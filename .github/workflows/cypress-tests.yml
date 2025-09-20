@@ -34,5 +34,8 @@ jobs:
           install: false
           config: baseUrl=https://mecanizze-ui.vercel.app
           record: true
+          component: false
+          publish-summary: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
