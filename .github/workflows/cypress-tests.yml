@@ -25,23 +25,17 @@ jobs:
       - name: 📦 Instalar dependências
         run: pnpm install
 
-      - name: 📥 Baixar binário do Cypress
+      - name: 📥 Instalar binário do Cypress
         run: pnpm exec cypress install
 
-      - name: 🚀 Start do app (modo dev)
-        run: pnpm run dev & # ou 'quasar dev &' dependendo do seu script
+      - name: 🚀 Iniciar o app Quasar (modo dev)
+        run: pnpm run dev &  # ou quasar dev & se for o script
         env:
           NODE_ENV: development
 
-      - name: ⏳ Esperar app subir
-        uses: jakejarvis/wait-for-netlify-action@v1
-        with:
-          url: 'http://localhost:9000' # ajuste para a porta correta
-          timeout: 60
-
-      - name: 🧪 Rodar Cypress
+      - name: 🧪 Rodar Cypress (E2E)
         uses: cypress-io/github-action@v6
         with:
-          install: false # já instalamos o Cypress acima
-          wait-on: 'http://localhost:9000'
+          install: false  # Já fizemos `pnpm install` e `cypress install`
+          wait-on: 'http://localhost:9000'  # Altere se sua porta for diferente
           wait-on-timeout: 60
