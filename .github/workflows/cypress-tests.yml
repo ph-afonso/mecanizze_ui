@@ -8,22 +8,33 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
+      # 1. Baixa o seu código para o servidor
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      # A action oficial do Cypress. Ela vai:
-      # 1. Instalar o pnpm (porque detecta o arquivo pnpm-lock.yaml)
-      # 2. Rodar "pnpm install" para instalar as dependências do projeto
-      # 3. Instalar o binário do Cypress e salvá-lo em cache
-      # 4. Iniciar seu servidor com "pnpm dev"
-      # 5. Esperar o servidor responder na porta 8080
-      # 6. Rodar os testes
+      # 2. Instala o pnpm no servidor
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      # 3. Configura a versão correta do Node.js e ativa o cache do pnpm
+      - name: Instalar Node.js e cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      # 4. Instala as dependências do projeto (node_modules)
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      # 5. Roda a action do Cypress, que agora encontrará o pnpm e as dependências
       - name: Executar testes Cypress
         uses: cypress-io/github-action@v6
         with:
           start: pnpm dev
-          wait-on: 'http://localhost:8080' # Ajuste a porta se for diferente
+          wait-on: 'http://localhost:8080'
           record: true
         env:
-          # A chave continua sendo passada de forma segura
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
