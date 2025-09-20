@@ -4,7 +4,7 @@
       <q-page class="flex flex-center bg-grey-2">
         <q-card class="q-pa-md shadow-2 my_card" bordered>
           <q-card-section class="text-center">
-            <div class="text-grey-9 text-h5 text-weight-bold">Acessar Sistema</div>
+            <div class="text-grey-9 text-h5 text-weight-bold">Acessar</div>
             <div class="text-grey-8">Faça login para continuar</div>
           </q-card-section>
 
