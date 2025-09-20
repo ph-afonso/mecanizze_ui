@@ -1,0 +1,21 @@
+# .github/workflows/cypress-tests.yml
+
+name: Testes Cypress
+
+on: [push] # Roda sempre que houver um novo push no repositório
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest # Roda em um servidor Linux virtual
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Executar testes Cypress e gravar os resultados
+        # Esta é a action oficial do Cypress que faz tudo para você
+        uses: cypress-io/github-action@v6
+        with:
+          record: true # Equivalente ao --record
+        env:
+          # A chave é passada de forma segura, como um "segredo"
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
