@@ -28,6 +28,15 @@ jobs:
       - name: 📥 Instalar binário do Cypress
         run: pnpm exec cypress install
 
+      - name: 🔍 Verificar se CYPRESS_RECORD_KEY está definido
+        run: |
+          if [ -z "${{ secrets.CYPRESS_RECORD_KEY }}" ]; then
+            echo "❌ CYPRESS_RECORD_KEY não está definido!"
+            exit 1
+          else
+            echo "✅ CYPRESS_RECORD_KEY está definido."
+          fi
+
       - name: 🧪 Rodar Cypress (E2E) contra Vercel
         uses: cypress-io/github-action@v6
         with:
