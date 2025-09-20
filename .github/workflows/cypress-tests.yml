@@ -1,34 +1,14 @@
 # .github/workflows/cypress-tests.yml
 
-name: Testes Cypress
+name: E2E Cypress Tests
 
 on: [push]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      # --- PASSO ADICIONADO AQUI ---
-      - name: Instalar pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10 # Você pode especificar a versão do pnpm que está usando
-      # ---------------------------
-
-      # É uma boa prática definir a versão do Node.js e configurar o cache
-      - name: Instalar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm' # MUITO IMPORTANTE: configura o cache para o pnpm
-
-      - name: Executar testes Cypress e gravar os resultados
-        uses: cypress-io/github-action@v6
-        with:
-          record: true
-          # A action do Cypress vai rodar "pnpm install" automaticamente
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      - name: Checkout
+      - uses: actions/checkout@v4
+      - name: Cypress run
+      - uses: cypress-io/github-action@v6
