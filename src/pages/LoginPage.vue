@@ -71,6 +71,14 @@
             loading.value = true;
             await authStore.login(form.value);
             await router.push({ name: 'home' });
+
+            const successMessage = 'Login realizado com sucesso';
+
+            $q.notify({
+                type: 'positive',
+                message: successMessage,
+                position: 'top',
+            });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido';
             
