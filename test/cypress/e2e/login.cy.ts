@@ -10,8 +10,8 @@ describe('Fluxo de Login', () => {
 
   it('Cenário 1: Deverá ter sucesso ao fazer login e gravará o token no local storage.', () => {
     // Passo 1: Preencher o formulário com dados válidos
-    cy.get('input[type="email"]').type('admin@quasar.com');
-    cy.get('input[type="password"]').type('password');
+    cy.get('input[type="email"]').type('admin@mecanizze.com');
+    cy.get('input[type="password"]').type('admin');
 
     // Passo 2: Submeter o formulário
     cy.get('form').submit();

@@ -81,7 +81,7 @@ function handleLogout() {
 }
 
 
-onMounted(() => {
-  authStore.checkAuth();
+onMounted(async () => {
+  await authStore.checkAuth();
 });
 </script>
