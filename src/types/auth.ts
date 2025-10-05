@@ -1,7 +1,14 @@
 export interface User {
-    name: string;
+     id?: number
     email: string;
-    role: 'admin' | 'user';
+    password?: string;
+    type: 'ADMIN' | 'USER';
+    profile: {
+        avatar: string;
+        full_name: string;
+        nickname: string;
+        background_image?: string | null;
+    }
 }
 
 export interface AuthState {
