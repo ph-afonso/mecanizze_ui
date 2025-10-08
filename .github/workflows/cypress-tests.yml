@@ -16,12 +16,12 @@ jobs:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js e npm
+      - name: 🟢 Setup Node.js e pnpm
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Habilita o cache de dependências para o npm
-          cache: 'npm'
+          # Habilita o pnpm através do Corepack e configura o cache de dependências
+          cache: 'pnpm'
 
       - name: 📦 Instalar dependências
         # 'npm ci' é a opção recomendada para CI/CD, pois garante instalações limpas e consistentes.
@@ -43,32 +43,17 @@ jobs:
       - name: 🧪 Rodar Cypress (E2E)
         uses: cypress-io/github-action@v6
         with:
-          # Comando para iniciar o servidor de desenvolvimento via npm
-          start: npm run dev
+          # Comando para iniciar o servidor de desenvolvimento (definido em package.json -> scripts -> dev)
+          start: pnpm dev
           # URL para esperar antes de iniciar os testes
           wait-on: 'http://127.0.0.1:8080'
-          # Timeout aumentado para 5 minutos (300s) para dar tempo ao servidor de iniciar no CI.
-          wait-on-timeout: 300
+          # Timeout em segundos. Aumente se o seu app demorar mais para iniciar.
+          wait-on-timeout: 120
           install: false
-          # Especificar o browser ajuda a garantir consistência e estabilidade nos testes.
-          browser: chrome
           record: true
           component: false
           publish-summary: true
         env:
-          # Alinha o ambiente do CI com o script "test:e2e:ci" do seu package.json
-          NODE_ENV: test
           # A chave para gravar os resultados no Cypress Dashboard
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-      # Este passo só será executado se o passo anterior falhar.
-      # Ele salva os vídeos e capturas de tela dos testes para facilitar a depuração.
-      - name: 📤 Upload dos artefatos do Cypress em caso de falha
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-artifacts
-          path: |
-            cypress/videos
-            cypress/screenshots
 
