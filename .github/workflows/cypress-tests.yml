@@ -1,8 +1,6 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -14,36 +12,39 @@ jobs:
       - name: 📥 Checkout do código
         uses: actions/checkout@v3
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js com cache para npm
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-
-      - name: 🛠️ Instalar pnpm
-        run: npm install -g pnpm
+          cache: 'npm'
 
       - name: 📦 Instalar dependências
-        run: pnpm install
+        run: npm ci
 
-      - name: 📥 Instalar binário do Cypress
-        run: pnpm exec cypress install
-
-      - name: 🔍 Verificar se CYPRESS_RECORD_KEY está definido
-        run: |
-          if [ -z "${{ secrets.CYPRESS_RECORD_KEY }}" ]; then
-            echo "❌ CYPRESS_RECORD_KEY não está definido!"
-            exit 1
-          else
-            echo "✅ CYPRESS_RECORD_KEY está definido."
-          fi
-
-      - name: 🧪 Rodar Cypress (E2E) contra Vercel
+      - name: 🧪 Rodar Cypress (E2E) contra o código do PR
         uses: cypress-io/github-action@v6
         with:
-          install: false
-          config: baseUrl=https://mecanizze-ui-develop.vercel.app
+          # Inicia o servidor de desenvolvimento em segundo plano usando o seu script do package.json
+          start: npm run dev
+          # Espera que a aplicação esteja pronta em localhost:8080 antes de iniciar os testes
+          wait-on: 'http://localhost:8080'
+          # Define um tempo de espera generoso para o servidor iniciar
+          wait-on-timeout: 300 # 5 minutos
+          browser: chrome
           record: true
-          component: false
           publish-summary: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Define o ambiente para 'test', que é uma boa prática
+          NODE_ENV: test
+
+      - name: 📤 Upload de Artefatos em caso de falha
+        # Este passo só é executado se os testes falharem
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/videos
+            cypress/screenshots
+
