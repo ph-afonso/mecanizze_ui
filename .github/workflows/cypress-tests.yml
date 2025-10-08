@@ -16,18 +16,18 @@ jobs:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js e pnpm
+      - name: 🟢 Setup Node.js e npm
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Habilita o pnpm através do Corepack e configura o cache de dependências
-          cache: 'pnpm'
+          # Habilita o npm através do Corepack e configura o cache de dependências
+          cache: 'npm'
 
       - name: 📦 Instalar dependências
-        run: pnpm install
+        run: npm install
 
       - name: 📥 Instalar binário do Cypress
-        run: pnpm exec cypress install
+        run: npm exec cypress install
 
       - name: 🔍 Verificar se o CYPRESS_RECORD_KEY está definido
         run: |
@@ -43,7 +43,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           # Comando para iniciar o servidor de desenvolvimento (definido em package.json -> scripts -> dev)
-          start: pnpm dev
+          start: npm dev
           # URL para esperar antes de iniciar os testes
           wait-on: 'http://127.0.0.1:8080'
           # Timeout aumentado para 5 minutos (300s) para dar tempo ao servidor de iniciar no CI.
