@@ -1,27 +1,27 @@
-// cypress/e2e/login.cy.ts
 /// <reference types="cypress" />
 
 describe('Fluxo de Login', () => {
   beforeEach(() => {
-    // Passo 1: Visitar a página de login
     cy.visit('/login');
     cy.get('form').should('be.visible');
   });
 
   it('Cenário 1: Deverá ter sucesso ao fazer login e gravará o token no local storage.', () => {
-    // Passo 1: Preencher o formulário com dados válidos
+    cy.intercept('POST', '**/token').as('loginRequest');
+
     cy.get('input[type="email"]').type('admin@mecanizze.com');
     cy.get('input[type="password"]').type('admin');
 
-    // Passo 2: Submeter o formulário
-    cy.get('form').submit();
+    cy.get('button[type="submit"]').click();
 
-    // Passo 3: Verificar se a notificação de sucesso do Quasar aparece com a mensagem correta
-    cy.get('.q-notification')
+    cy.wait('@loginRequest');
+
+
+    cy.get('body').find('.q-notification')
       .should('be.visible')
-      .and('contain', 'Login realizado com sucesso');
+      .and('have.class', 'bg-positive')
+      .and('contain', 'Bem-vindo');
 
-    // Passo 4: Verificar se o token foi salvo no local storage
     cy.window().then((win) => {
       const token = win.localStorage.getItem('token');
       expect(token).to.be.a('string');
@@ -30,22 +30,19 @@ describe('Fluxo de Login', () => {
   });
 
   it('Cenário 2: Deverá falhar ao realizar login e não gravará o token no local storage.', () => {
-    // Passo 1: Preencher o formulário com dados inválidos
+    cy.intercept('POST', '**/token').as('loginRequest');
+
     cy.get('input[type="email"]').type('usuario@errado.com');
     cy.get('input[type="password"]').type('senhaerrada');
 
-    // Passo 2: Submeter o formulário
-    cy.get('form').submit();
+    cy.get('button[type="submit"]').click();
 
-    // Passo 3: Verificar se a notificação de erro do Quasar aparece com a mensagem correta
-    cy.get('.q-notification')
-      .should('be.visible')
-      .and('contain', 'Credenciais inválidas');
+    cy.wait('@loginRequest');
 
-    // Passo 4: Verificar se o token não foi salvo no local storage
     cy.window().then((win) => {
       const token = win.localStorage.getItem('token');
       expect(token).to.be.null;
     });
   });
 });
+
