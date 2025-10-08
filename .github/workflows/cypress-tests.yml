@@ -1,12 +1,10 @@
-# Nome do Workflow
-name: E2E Tests (Develop -> Main)
+name: E2E Tests
 
-# Gatilho (trigger): Este workflow será executado apenas em Pull Requests abertos para a branch 'main'.
-# Isso garante que ele rode quando você tentar mesclar 'develop' -> 'main'.
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened] # Executa ao abrir, atualizar ou reabrir um PR
 
 jobs:
   e2e-tests:
@@ -14,14 +12,15 @@ jobs:
 
     steps:
       - name: 📥 Checkout do código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: 🟢 Setup Node.js e pnpm
-        uses: actions/setup-node@v4
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
-          # Habilita o pnpm através do Corepack e configura o cache de dependências
-          cache: 'pnpm'
+
+      - name: 🛠️ Instalar pnpm
+        run: npm install -g pnpm
 
       - name: 📦 Instalar dependências
         # 'npm ci' é a opção recomendada para CI/CD, pois garante instalações limpas e consistentes.
@@ -30,30 +29,22 @@ jobs:
       - name: 📥 Instalar binário do Cypress
         run: npx cypress install
 
-      - name: 🔍 Verificar se o CYPRESS_RECORD_KEY está definido
+      - name: 🔍 Verificar se CYPRESS_RECORD_KEY está definido
         run: |
           if [ -z "${{ secrets.CYPRESS_RECORD_KEY }}" ]; then
             echo "❌ CYPRESS_RECORD_KEY não está definido!"
             exit 1
+          else
+            echo "✅ CYPRESS_RECORD_KEY está definido."
           fi
-          echo "✅ Secret CYPRESS_RECORD_KEY verificada."
 
-      # Este passo agora inicia o servidor da aplicação do PR e roda os testes contra ele.
-      # Isso garante que o código exato do PR está sendo testado.
-      - name: 🧪 Rodar Cypress (E2E)
+      - name: 🧪 Rodar Cypress (E2E) contra Vercel
         uses: cypress-io/github-action@v6
         with:
-          # Comando para iniciar o servidor de desenvolvimento (definido em package.json -> scripts -> dev)
-          start: pnpm dev
-          # URL para esperar antes de iniciar os testes
-          wait-on: 'http://127.0.0.1:8080'
-          # Timeout em segundos. Aumente se o seu app demorar mais para iniciar.
-          wait-on-timeout: 120
           install: false
+          config: baseUrl=https://mecanizze-ui-develop.vercel.app
           record: true
           component: false
           publish-summary: true
         env:
-          # A chave para gravar os resultados no Cypress Dashboard
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
