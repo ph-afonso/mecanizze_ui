@@ -46,9 +46,11 @@ jobs:
           start: pnpm dev
           # URL para esperar antes de iniciar os testes
           wait-on: 'http://127.0.0.1:8080'
-          # Timeout em segundos. Aumente se o seu app demorar mais para iniciar.
-          wait-on-timeout: 120
+          # Timeout aumentado para 5 minutos (300s) para dar tempo ao servidor de iniciar no CI.
+          wait-on-timeout: 300
           install: false
+          # Especificar o browser ajuda a garantir consistência e estabilidade nos testes.
+          browser: chrome
           record: true
           component: false
           publish-summary: true
