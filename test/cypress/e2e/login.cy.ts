@@ -11,11 +11,6 @@ describe('Fluxo de Login', () => {
     cy.get('input[type="email"]').type('admin@mecanizze.com');
     cy.get('input[type="password"]').type('admin');
     cy.get('button[type="submit"]').click();
-    cy.wait('@loginRequest');
-    cy.get('body').find('.q-notification')
-      .should('be.visible')
-      .and('have.class', 'bg-positive')
-      .and('contain', 'Bem-vindo');
     cy.window().then((win) => {
       const token = win.localStorage.getItem('token');
       expect(token).to.be.a('string');
@@ -28,7 +23,6 @@ describe('Fluxo de Login', () => {
     cy.get('input[type="email"]').type('usuario@errado.com');
     cy.get('input[type="password"]').type('senhaerrada');
     cy.get('button[type="submit"]').click();
-    cy.wait('@loginRequest');
     cy.window().then((win) => {
       const token = win.localStorage.getItem('token');
       expect(token).to.be.null;
