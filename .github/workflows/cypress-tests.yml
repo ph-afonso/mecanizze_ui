@@ -24,10 +24,11 @@ jobs:
           cache: 'pnpm'
 
       - name: 📦 Instalar dependências
-        run: pnpm install
+        # 'npm ci' é a opção recomendada para CI/CD, pois garante instalações limpas e consistentes.
+        run: npm ci
 
       - name: 📥 Instalar binário do Cypress
-        run: pnpm exec cypress install
+        run: npx cypress install
 
       - name: 🔍 Verificar se o CYPRESS_RECORD_KEY está definido
         run: |
