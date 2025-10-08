@@ -2,11 +2,7 @@
 
 describe('Fluxo de Login', () => {
   beforeEach(() => {
-    cy.visit('/login', {
-      headers: {
-        'x-vercel-protection-bypass': Cypress.env('VERCEL_PROTECTION_BYPASS_KEY')
-      }
-    });
+    cy.visit('/login');
     cy.get('form').should('be.visible');
   });
 
